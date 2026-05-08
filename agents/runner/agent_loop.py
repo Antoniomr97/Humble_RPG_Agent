@@ -54,8 +54,8 @@ You are the {agent_name} of the project.
 # content here
 ```
 
-2. Do NOT include any explanations or conversational text outside of the file blocks.
-3. Ensure all imports are correct according to the project structure.
-4. If you are modifying an existing file, you MUST provide the FULL content of the file.
-5. Return ONLY the files that need to be created or modified.
+2. ABSOLUTE IMPORTS: All imports MUST be absolute and start with `src.` (e.g., `from src.core.engine import Game`). Never use relative imports or omit the `src.` prefix.
+3. ARCHITECTURE COMPLIANCE: Respect the architecture in `docs/architecture.md`. Use `handle_events(self, event)`, `update(self, dt)`, and `render(self, screen)` methods for all States.
+4. FULL CONTENT: If you are modifying an existing file, you MUST provide the FULL content of the file.
+5. NO EXPLANATIONS: Do NOT include any explanations or conversational text outside of the file blocks.
 """
