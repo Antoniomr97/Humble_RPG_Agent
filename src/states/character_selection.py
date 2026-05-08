@@ -18,6 +18,10 @@ class CharacterSelectionState(State):
         }
         self.character_rects = []
         self.initialized_rects = False
+        
+        # Initialize fonts ONCE in __init__ for performance
+        self.title_font = pygame.font.Font(None, 48)
+        self.info_font = pygame.font.Font(None, 24)
 
     def handle_events(self, event):
         if event.type == MOUSEBUTTONDOWN:
@@ -31,20 +35,24 @@ class CharacterSelectionState(State):
         pass
 
     def render(self, screen):
-        screen.fill((30, 30, 30))
+        # Use a lighter background to confirm rendering
+        screen.fill((100, 100, 100))
         width, height = screen.get_size()
         
-        # Clear rects to redefine them (or just do it once)
+        # Draw title
+        title_surf = self.title_font.render("Selecciona tu Personaje", True, (255, 255, 255))
+        screen.blit(title_surf, (width//2 - title_surf.get_width()//2, 50))
+        
         if not self.initialized_rects:
             self.character_rects = []
             
         for i, (name, color) in enumerate(self.colors.items()):
             # Calculate position
-            rect_width = 200
-            rect_height = 200
+            rect_width = 180
+            rect_height = 180
             spacing = (width - (rect_width * 3)) // 4
             x = spacing + i * (rect_width + spacing)
-            y = (height // 2) - 150
+            y = (height // 2) - 100
             
             char_rect = pygame.Rect(x, y, rect_width, rect_height)
             if not self.initialized_rects:
@@ -52,14 +60,15 @@ class CharacterSelectionState(State):
             
             # Draw character square
             pygame.draw.rect(screen, color, char_rect)
+            # Add a white border
+            pygame.draw.rect(screen, (255, 255, 255), char_rect, 2)
             
             # Draw name and stats below
-            font = pygame.font.Font(None, 24)
-            name_surf = font.render(name, True, (255, 255, 255))
-            screen.blit(name_surf, (x, y + rect_height + 10))
+            name_surf = self.info_font.render(name, True, (255, 255, 255))
+            screen.blit(name_surf, (x, y + rect_height + 15))
             
             stat_text = f"HP: {self.stats[name]['Vida']} | ATK: {self.stats[name]['Ataque']}"
-            stats_surf = font.render(stat_text, True, (200, 200, 200))
+            stats_surf = self.info_font.render(stat_text, True, (220, 220, 220))
             screen.blit(stats_surf, (x, y + rect_height + 40))
             
         self.initialized_rects = True
