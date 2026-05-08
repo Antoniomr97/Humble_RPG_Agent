@@ -1,3 +1,4 @@
+import pygame
 from src.states.base_state import State
 
 class CharacterSelectionState(State):
