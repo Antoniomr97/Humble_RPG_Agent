@@ -29,7 +29,7 @@ class CombatState(State):
         
         # UI
         font = pygame.font.Font(None, 48)
-        title = font.render("¡COMBATE INICIADO!", True, (255, 255, 255))
+        title = font.render("COMBATE INICIADO", True, (255, 255, 255))
         screen.blit(title, (width//2 - title.get_width()//2, 100))
         
         font_small = pygame.font.Font(None, 24)

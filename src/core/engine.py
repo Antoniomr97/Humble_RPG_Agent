@@ -2,8 +2,11 @@ import pygame
 
 class Game:
     def __init__(self, width=800, height=600):
+        print("DEBUG: pygame.init() starting")
         pygame.init()
+        print("DEBUG: pygame.display.set_mode() starting")
         self.screen = pygame.display.set_mode((width, height))
+        print("DEBUG: display mode set")
         pygame.display.set_caption("Humble RPG Adventure")
         self.clock = pygame.time.Clock()
         self.running = True
@@ -13,8 +16,13 @@ class Game:
         self.state_manager = state_manager
 
     def run(self):
-        print("🎮 Game loop started")
+        print("Game loop started")
+        frame_count = 0
         while self.running:
+            frame_count += 1
+            if frame_count % 60 == 0:
+                print(f"DEBUG: Frame {frame_count} rendered")
+            
             dt = self.clock.tick(60) / 1000.0  # Delta time in seconds
             
             for event in pygame.event.get():
@@ -31,4 +39,4 @@ class Game:
             pygame.display.flip()
 
         pygame.quit()
-        print("🛑 Game loop ended")
+        print("Game loop ended")
