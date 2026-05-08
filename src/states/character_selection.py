@@ -20,10 +20,8 @@ class CharacterSelectionState(State):
         self.initialized_rects = False
         
         # Initialize fonts ONCE in __init__ for performance
-        print("DEBUG: Loading fonts...")
         self.title_font = pygame.font.Font(None, 48)
         self.info_font = pygame.font.Font(None, 24)
-        print("DEBUG: Fonts loaded")
 
     def handle_events(self, event):
         if event.type == MOUSEBUTTONDOWN:
@@ -37,8 +35,8 @@ class CharacterSelectionState(State):
         pass
 
     def render(self, screen):
-        # Use a lighter background to confirm rendering
-        screen.fill((100, 100, 100))
+        # Premium Dark Background
+        screen.fill((30, 30, 30))
         width, height = screen.get_size()
         
         # Draw title
