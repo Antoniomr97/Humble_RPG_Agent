@@ -1,13 +1,20 @@
-def build_context(agent):
-    context = ""
+import os
 
-    with open("../docs/architecture.md") as f:
-        context += f"\n[ARCHITECTURE]\n{f.read()}\n"
 
-    with open("../docs/game_design.md") as f:
-        context += f"\n[GAME DESIGN]\n{f.read()}\n"
+def build_context(repo_path):
+    structure = []
 
-    with open("../docs/combat_system.md") as f:
-        context += f"\n[COMBAT SYSTEM]\n{f.read()}\n"
+    for root, dirs, files in os.walk(repo_path):
+        # ignorar venv y basura
+        if "env" in root or "__pycache__" in root:
+            continue
 
-    return context
+        level = root.replace(repo_path, "").count(os.sep)
+        indent = "  " * level
+
+        structure.append(f"{indent}{os.path.basename(root)}/")
+
+        for f in files:
+            structure.append(f"{indent}  {f}")
+
+    return "\n".join(structure)

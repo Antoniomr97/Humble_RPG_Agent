@@ -1,36 +1,45 @@
 import os
+import re
 
-def apply_changes(response: str):
+
+FILE_PATTERN = r"# file:\s*(.+?)\s*\n```(?:python|py)?\n(.*?)```"
+
+
+def safe_path(repo_path, file_path):
     """
-    Interpreta la salida del agente y aplica cambios al proyecto.
-    Versión simple: detecta bloques de creación de archivos.
+    Evita path traversal tipo ../../
     """
+    full_path = os.path.abspath(os.path.join(repo_path, file_path))
+    repo_abs = os.path.abspath(repo_path)
 
-    lines = response.split("\n")
+    if not full_path.startswith(repo_abs):
+        raise ValueError(f"Unsafe path detected: {file_path}")
 
-    current_file = None
-    buffer = []
+    return full_path
 
-    for line in lines:
 
-        # Detectar inicio de archivo
-        if line.startswith("FILE:"):
-            current_file = line.replace("FILE:", "").strip()
-            buffer = []
+def write_files_from_response(repo_path, response):
+    matches = re.findall(FILE_PATTERN, response, re.DOTALL)
 
-        # Detectar fin de archivo
-        elif line.startswith("END FILE"):
-            if current_file:
-                os.makedirs(os.path.dirname(current_file), exist_ok=True)
+    if not matches:
+        print("❌ No files found in response")
+        print("DEBUG RESPONSE:\n", response[:1000])
+        return
 
-                with open(current_file, "w", encoding="utf-8") as f:
-                    f.write("\n".join(buffer))
+    print(f"📦 Files detected: {len(matches)}")
 
-                print(f"✔ Archivo creado: {current_file}")
+    for path, code in matches:
+        try:
+            full_path = safe_path(repo_path, path.strip())
 
-            current_file = None
-            buffer = []
+            os.makedirs(os.path.dirname(full_path), exist_ok=True)
 
-        else:
-            if current_file:
-                buffer.append(line)
+            cleaned_code = code.strip() + "\n"
+
+            with open(full_path, "w", encoding="utf-8") as f:
+                f.write(cleaned_code)
+
+            print(f"✅ Written: {full_path}")
+
+        except Exception as e:
+            print(f"❌ Error writing {path}: {e}")

@@ -1,12 +1,15 @@
 import os
 
-AGENTS_PATH = "../"
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))  # agents/
 
 def load_agent(name: str):
-    base = f"../{name}"
+    base = os.path.join(BASE_DIR, name)
+
+    system_path = os.path.join(base, "system.md")
+
+    if not os.path.exists(system_path):
+        raise FileNotFoundError(f"Missing system.md for agent: {name}")
 
     return {
-        "system": open(os.path.join(base, "system.md")).read(),
-        "rules": open(os.path.join(base, "rules.md")).read(),
-        "prompt": open(os.path.join(base, "prompt.md")).read(),
+        "system": open(system_path, "r", encoding="utf-8").read()
     }
