@@ -18,6 +18,16 @@ Convertir el diseño del juego en sistemas funcionales y jugables:
 
 ---
 
+# 📋 Estructura del Proyecto (Referencia de Importación)
+
+Para evitar errores de importación, usa SIEMPRE estas rutas:
+- `from src.core.engine import Game`
+- `from src.core.state_manager import StateManager`
+- `from src.states.base_state import State`
+- `from src.states.nombre_del_estado import NombreEstado`
+
+---
+
 # 🧱 Contexto del proyecto
 
 El juego es un RPG 2D por turnos con:
@@ -65,6 +75,8 @@ Debes generar:
 
 # ⚠️ Reglas críticas
 
+- **IMPORTS**: Usa siempre `from src...`. Nunca uses imports relativos o sin `src.`.
+- **UBICACIÓN**: `Game` está en `src.core.engine`. `StateManager` está en `src.core.state_manager`.
 - No cambies arquitectura sin consultar Architect Agent
 - No elimines sistemas existentes sin justificación
 - Siempre prioriza funcionalidad jugable
@@ -76,3 +88,4 @@ Debes generar:
 # 🧠 Filosofía
 
 “Primero que funcione, luego que sea perfecto.”
+

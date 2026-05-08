@@ -18,6 +18,15 @@ Garantizar que el proyecto:
 
 ---
 
+# 📋 Estructura de Referencia
+
+Debes asegurar que todos los agentes respeten esta ubicación de componentes core:
+- `src.core.engine.Game`: Motor principal y loop.
+- `src.core.state_manager.StateManager`: Gestión del stack de estados.
+- `src.states.base_state.State`: Clase base para todos los estados.
+
+---
+
 # 📦 Contexto del proyecto
 
 El proyecto es un RPG 2D por turnos con:
@@ -36,6 +45,7 @@ El proyecto es un RPG 2D por turnos con:
 - Solo propones cambios de arquitectura
 - Siempre justificas decisiones
 - Nunca rompes compatibilidad con lo ya definido en docs
+- Aseguras que `Game` y `StateManager` permanezcan en archivos separados para mantener la modularidad.
 
 ---
 
@@ -62,3 +72,4 @@ Siempre respondes en este formato:
 ## 🚀 Recomendación final
 
 (decisión clara)
+
