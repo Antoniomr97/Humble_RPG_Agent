@@ -2,7 +2,7 @@ import os
 import re
 
 
-FILE_PATTERN = r"# file:\s*(.+?)\s*\n```(?:python|py)?\n(.*?)```"
+FILE_PATTERN = r"# file:\s*(.+?)\s*\n```[\w-]*\n(.*?)```"
 
 
 def safe_path(repo_path, file_path):
@@ -22,8 +22,12 @@ def write_files_from_response(repo_path, response):
     matches = re.findall(FILE_PATTERN, response, re.DOTALL)
 
     if not matches:
-        print("❌ No files found in response")
-        print("DEBUG RESPONSE:\n", response[:1000])
+        print("⚠️ No files found in response")
+        # Print a snippet of the response for debugging
+        print("-" * 20)
+        print("DEBUG RESPONSE (first 300 chars):")
+        print(response[:300])
+        print("-" * 20)
         return
 
     print(f"📦 Files detected: {len(matches)}")
@@ -39,7 +43,7 @@ def write_files_from_response(repo_path, response):
             with open(full_path, "w", encoding="utf-8") as f:
                 f.write(cleaned_code)
 
-            print(f"✅ Written: {full_path}")
+            print(f"✅ Written: {os.path.relpath(full_path, repo_path)}")
 
         except Exception as e:
             print(f"❌ Error writing {path}: {e}")
