@@ -1,33 +1,37 @@
 import pygame
 from pygame.locals import *
-from states.state import State
+from src.states.base_state import State
 
-class BattleState(State):
-    def __init__(self, game):
-        super().__init__(game)
-        self.player = {
-            'Vida': 50,
-            'Ataque': 15
-        }
-        self.enemy = {
-            'Vida': 40,
-            'Ataque': 20
-        }
+class CombatState(State):
+    def __init__(self, manager, player_stats):
+        super().__init__(manager)
+        self.player_stats = player_stats
+        self.enemy_stats = {'Vida': 50, 'Ataque': 10}
+
+    def handle_events(self, event):
+        if event.type == KEYDOWN and event.key == K_ESCAPE:
+            # Return to map
+            self.manager.pop_state()
 
     def update(self, dt):
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                self.game.quit()
-            elif event.type == KEYDOWN and event.key == K_ESCAPE:
-                self.game.change_state('map')
+        pass
 
-    def draw(self, surface):
-        surface.fill((0, 0, 0))
-        font = pygame.font.Font(None, 36)
-        player_text = font.render(f"Jugador: Vida {self.player['Vida']}, Ataque {self.player['Ataque']}", True, (255, 255, 255))
-        enemy_text = font.render(f"Enemigo: Vida {self.enemy['Vida']}, Ataque {self.enemy['Ataque']}", True, (255, 255, 255))
-        surface.blit(player_text, (10, 10))
-        surface.blit(enemy_text, (10, 50))
-
-        pygame.draw.rect(surface, (0, 255, 0), (pygame.display.get_surface().get_width() // 4, pygame.display.get_surface().get_height() // 2, 100, 100))
-        pygame.draw.rect(surface, (255, 0, 0), (3 * pygame.display.get_surface().get_width() // 4, pygame.display.get_surface().get_height() // 2, 100, 100))
+    def render(self, screen):
+        screen.fill((50, 0, 0)) # Dark Red background
+        
+        width, height = screen.get_size()
+        
+        # Draw Player (Left)
+        pygame.draw.rect(screen, (0, 255, 0), (150, height//2 - 50, 100, 100))
+        
+        # Draw Enemy (Right)
+        pygame.draw.rect(screen, (255, 0, 0), (width - 250, height//2 - 50, 100, 100))
+        
+        # UI
+        font = pygame.font.Font(None, 48)
+        title = font.render("¡COMBATE INICIADO!", True, (255, 255, 255))
+        screen.blit(title, (width//2 - title.get_width()//2, 100))
+        
+        font_small = pygame.font.Font(None, 24)
+        info = font_small.render("Presiona ESC para huir (Volver al mapa)", True, (200, 200, 200))
+        screen.blit(info, (width//2 - info.get_width()//2, height - 50))

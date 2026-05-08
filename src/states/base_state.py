@@ -1,4 +1,7 @@
 class State:
+    def __init__(self, manager):
+        self.manager = manager
+
     def handle_events(self, event):
         pass
 

@@ -1,47 +1,65 @@
 import pygame
 from pygame.locals import *
-from states.state import State
+from src.states.base_state import State
+from src.states.map import MapState
 
 class CharacterSelectionState(State):
-    def __init__(self, game):
-        super().__init__(game)
+    def __init__(self, manager):
+        super().__init__(manager)
         self.colors = {
-            'Pícaro': (255, 69, 0),  # Vermillion
-            'Guerrero': (221, 160, 221),  # Backnister
-            'Mago': (0, 139, 139)  # Gandall
+            'Vermillion (Picaro)': (255, 69, 0),
+            'Backnister (Guerrero)': (221, 160, 221),
+            'Gandall (Mago)': (0, 139, 139)
         }
         self.stats = {
-            'Pícaro': {'Vida': 50, 'Ataque': 15},
-            'Guerrero': {'Vida': 70, 'Ataque': 20},
-            'Mago': {'Vida': 40, 'Ataque': 30}
+            'Vermillion (Picaro)': {'Vida': 50, 'Ataque': 15},
+            'Backnister (Guerrero)': {'Vida': 70, 'Ataque': 20},
+            'Gandall (Mago)': {'Vida': 40, 'Ataque': 30}
         }
-        self.selected_character = None
         self.character_rects = []
+        self.initialized_rects = False
+
+    def handle_events(self, event):
+        if event.type == MOUSEBUTTONDOWN:
+            for rect, name in self.character_rects:
+                if rect.collidepoint(event.pos):
+                    print(f"Selected: {name}")
+                    # Transition to MapState, passing the stats
+                    self.manager.change_state(MapState(self.manager, self.stats[name]))
 
     def update(self, dt):
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                self.game.quit()
-            elif event.type == KEYDOWN and event.key == K_ESCAPE:
-                self.game.change_state('menu')
-            elif event.type == MOUSEBUTTONDOWN:
-                for rect, character in zip(self.character_rects, self.colors.keys()):
-                    if rect.collidepoint(event.pos):
-                        self.selected_character = character
-                        self.game.player = self.stats[character]
-                        self.game.change_state('map')
+        pass
 
-    def draw(self, surface):
-        surface.fill((0, 0, 0))
-        width, height = surface.get_size()
+    def render(self, screen):
+        screen.fill((30, 30, 30))
+        width, height = screen.get_size()
+        
+        # Clear rects to redefine them (or just do it once)
+        if not self.initialized_rects:
+            self.character_rects = []
+            
         for i, (name, color) in enumerate(self.colors.items()):
-            x = width // 3 * i
-            y = height // 2
-            rect = pygame.Rect(x, y, width // 3, height // 3)
-            pygame.draw.rect(surface, color, rect)
-            font = pygame.font.Font(None, 36)
-            text_name = font.render(name, True, (0, 0, 0))
-            text_stats = font.render(f"Vida: {self.stats[name]['Vida']}, Ataque: {self.stats[name]['Ataque']}", True, (0, 0, 0))
-            surface.blit(text_name, (x + 10, y + 10))
-            surface.blit(text_stats, (x + 10, y + 50))
-            self.character_rects.append(rect)
+            # Calculate position
+            rect_width = 200
+            rect_height = 200
+            spacing = (width - (rect_width * 3)) // 4
+            x = spacing + i * (rect_width + spacing)
+            y = (height // 2) - 150
+            
+            char_rect = pygame.Rect(x, y, rect_width, rect_height)
+            if not self.initialized_rects:
+                self.character_rects.append((char_rect, name))
+            
+            # Draw character square
+            pygame.draw.rect(screen, color, char_rect)
+            
+            # Draw name and stats below
+            font = pygame.font.Font(None, 24)
+            name_surf = font.render(name, True, (255, 255, 255))
+            screen.blit(name_surf, (x, y + rect_height + 10))
+            
+            stat_text = f"HP: {self.stats[name]['Vida']} | ATK: {self.stats[name]['Ataque']}"
+            stats_surf = font.render(stat_text, True, (200, 200, 200))
+            screen.blit(stats_surf, (x, y + rect_height + 40))
+            
+        self.initialized_rects = True
