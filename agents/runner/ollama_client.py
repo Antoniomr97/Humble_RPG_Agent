@@ -29,6 +29,15 @@ class OllamaClient:
         except Exception as e:
             return f"❌ Error calling Ollama API: {e}"
 
+    def list_local_models(self):
+        try:
+            response = requests.get(f"{self.base_url}/api/tags", timeout=5)
+            if response.status_code == 200:
+                return [m['name'] for m in response.json().get('models', [])]
+            return []
+        except:
+            return []
+
 def call_ollama(prompt, model="qwen2.5-coder:7b"):
     client = OllamaClient(model=model)
     return client.generate(prompt)

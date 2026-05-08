@@ -12,11 +12,38 @@ def print_header():
     print("\033[96m" + "   🤖 RPG AGENTIC 2D — OLLAMA ORCHESTRATOR" + "\033[0m")
     print("\033[95m" + "="*50 + "\033[0m")
 
+def select_model():
+    temp_runner = AgentRunner()
+    models = temp_runner.client.list_local_models()
+    
+    print("\n\033[1mAvailable Models in Ollama:\033[0m")
+    if not models:
+        print(" ⚠️  No models found or Ollama is not running.")
+        model = input(" Enter model name manually (e.g., qwen2.5-coder:7b): ").strip()
+        return model if model else "qwen2.5-coder:7b"
+    
+    for i, model in enumerate(models, 1):
+        print(f" {i}. {model}")
+    
+    while True:
+        try:
+            choice = input(f"\nSelect model (1-{len(models)}) [default 1]: ").strip()
+            if not choice: return models[0]
+            idx = int(choice) - 1
+            if 0 <= idx < len(models):
+                return models[idx]
+        except ValueError:
+            pass
+        print("❌ Invalid selection.")
+
 def main():
     clear_screen()
     print_header()
     
-    runner = AgentRunner()
+    selected_model = select_model()
+    print(f"\n✅ Using model: \033[92m{selected_model}\033[0m")
+    
+    runner = AgentRunner(model=selected_model)
     repo_path = "." # Current directory
 
     while True:
@@ -64,11 +91,8 @@ def main():
                 # Execute the agent loop
                 response = runner.run(repo_path, current_task, system_prompt, agent_name)
                 
-                # In a full flow, the output of one could potentially influence the next
-                # For now, we keep the task but notify about completion
                 print(f"✅ {agent_name} completed.")
                 
-                # If we have more agents, maybe we wait a bit for visibility
                 if len(agents_to_run) > 1:
                     time.sleep(1)
                     
