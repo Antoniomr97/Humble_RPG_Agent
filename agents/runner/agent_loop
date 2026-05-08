@@ -1,0 +1,65 @@
+from runner.loader import load_agent
+from runner.context_builder import build_context
+from runner.ollama_client import call_ollama
+from runner.executor import apply_changes
+
+
+AGENT_FLOW = ["architect", "gameplay", "reviewer"]
+
+
+def build_prompt(agent, task, context, previous_output=None):
+    prompt = f"""
+You are the {agent['name']} agent in an RPG development system.
+
+SYSTEM:
+{agent['system']}
+
+RULES:
+{agent['rules']}
+
+TASK:
+{task}
+
+CONTEXT:
+{context}
+"""
+
+    if previous_output:
+        prompt += f"\n\nPREVIOUS OUTPUT:\n{previous_output}\n"
+
+    return prompt
+
+
+def run_agent_loop(task: str):
+    context = build_context(None)
+
+    previous_output = None
+
+    for agent_name in AGENT_FLOW:
+
+        agent = load_agent(agent_name)
+
+        print(f"\n🚀 Running agent: {agent_name}")
+
+        prompt = build_prompt(
+            {"name": agent_name, **agent},
+            task,
+            context,
+            previous_output
+        )
+
+        output = call_ollama(prompt)
+
+        print(f"\n🧠 OUTPUT ({agent_name}):\n")
+        print(output)
+
+        previous_output = output
+
+    # 🔥 SOLO EL REVIEWER OUTPUT SE USA PARA EJECUTAR
+    print("\n⚙️ Applying changes with executor...\n")
+    apply_changes(previous_output)
+
+
+if __name__ == "__main__":
+    task = input("Enter feature task: ")
+    run_agent_loop(task)

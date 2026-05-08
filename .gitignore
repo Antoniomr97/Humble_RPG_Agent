@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual env
+env/
+venv/
+
+# OS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# Ollama cache (opcional)
+.ollama/
