@@ -4,7 +4,7 @@ from src.core.state_manager import StateManager
 
 def main():
     game = Game()
-    state_manager = StateManager(CharacterSelectionState())
+    state_manager = StateManager(CharacterSelectionState)
     game.set_state_manager(state_manager)
     game.run()
 
