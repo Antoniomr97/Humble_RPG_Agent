@@ -1,17 +1,25 @@
-# Humble Adventure Architect - PROTOCOLO ESTRICTO
+# Humble Adventure Architect - PROTOCOLO ESTRICTO v2.0
 
 ## PRIORIDAD MÁXIMA: INTEGRIDAD ESTRUCTURAL
-1. **PROHIBIDO REFACTORIZAR**: No cambies la estructura de directorios ni renombres clases base (`State`, `Game`, `StateMachine`) sin permiso explícito.
-2. **VERIFICACIÓN DE IMPORTS**: Antes de proponer cualquier código, verifica físicamente que la ruta del import existe. 
-   - La clase `State` SIEMPRE debe importarse de `src.core.state`.
-   - El motor `Game` SIEMPRE debe importarse de `src.core.engine`.
-3. **PATRÓN DE ESTADOS**: Respeta el sistema de estados actual. Cada nuevo estado DEBE heredar de `src.core.state.State` e implementar `handle_events`, `update` y `render`.
+1. **PROHIBIDO REFACTORIZAR CLASES BASE**: No cambies `State`, `Game`, o `StateMachine` sin permiso.
+2. **VERIFICACIÓN DE RUTAS (SNAKE_CASE)**: 
+   - Los nombres de archivos DEBEN ser `snake_case` (ej. `map_state.py`).
+   - PROHIBIDO crear archivos CamelCase (ej. `MapState.py`).
+   - PROHIBIDO crear archivos con el mismo nombre en diferentes directorios.
+3. **ESTRUCTURA DE ESTADOS**:
+   - Todos los estados del juego DEBEN estar en `src/states/`.
+   - `src/core/states/` es una ruta OBSOLETA. No la uses.
+4. **IMPORTACIÓN DE CLASES**:
+   - `State` siempre desde `src.core.state`.
+   - `Game` siempre desde `src.core.engine`.
 
-## LISTA DE NOMBRES SAGRADOS (PROHIBIDO CAMBIAR)
-- El estado de selección DEBE llamarse: `CharacterSelectionState`
-- El estado de mapa DEBE llamarse: `MapState`
-- El estado de combate DEBE llamarse: `CombatState`
+## LISTA DE NOMBRES SAGRADOS
+- Estado de selección: `CharacterSelectionState` (en `src/states/character_selection.py`)
+- Estado de mapa: `MapState` (en `src/states/map_state.py`)
+- Estado de combate: `CombatState` (en `src/states/combat_state.py`)
 
 ## REGLAS DE CODIFICACIÓN PARA AGENTES LOCALES
-- **Código Completo**: No entregues fragmentos. Entrega el archivo completo para evitar errores de sangría o pérdida de imports.
-- **Sin Alucinaciones de Rutas**: Si no estás seguro de dónde está un archivo, usa `ls` o pregunta. No asumas que los archivos están en `src/states/` si el proyecto usa `src/core/states/` (o viceversa).
+- **Gestión de Estados**: Usa `self.game.set_state(NuevoEstado(self.game, ...))`. No uses `self.manager` ni Enums para transiciones de estado.
+- **Sin Alucinaciones de Filenames**: Nunca uses un bloque de código como nombre de archivo. Verifica siempre el path antes de escribir.
+- **Limpieza**: Si detectas archivos duplicados o con nombres incorrectos (CamelCase), bórralos o informa inmediatamente.
+
