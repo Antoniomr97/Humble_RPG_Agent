@@ -1,36 +1,39 @@
-import pygame
+from src.core.engine import Game
 from src.core.state import State
 
 class CombatState(State):
-    def __init__(self, game, player):
-        self.game = game
-        self.player = player
-        self.background_color = (139, 0, 0) # Dark Red for combat
+    def __init__(self, game: Game):
+        super().__init__(game)
+        self.options = ["ATACAR", "DEFENDER"]
+        self.selected_option_index = 0
+        self.font = pygame.font.Font(None, 36)
+        self.back_button_rect = pygame.Rect(50, 50, 120, 40)
 
     def handle_events(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                from src.states.map_state import MapState
-                # We return to map, but ideally we'd pass the same player data
-                self.game.set_state(MapState(self.game, self.player))
+            if event.key == pygame.K_UP and self.selected_option_index > 0:
+                self.selected_option_index -= 1
+            elif event.key == pygame.K_DOWN and self.selected_option_index < len(self.options) - 1:
+                self.selected_option_index += 1
+            elif event.key == pygame.K_RETURN:
+                self.execute_selected_option()
+        elif event.type == pygame.MOUSEBUTTONDOWN and self.back_button_rect.collidepoint(event.pos):
+            self.game.set_state(MapState(self.game))
 
     def update(self, dt):
         pass
 
     def render(self, screen):
-        screen.fill(self.background_color)
-        
-        # Render player
-        if "image" in self.player:
-            img = pygame.transform.scale(self.player["image"], (100, 100))
-            rect = img.get_rect(center=(screen.get_width() // 4, screen.get_height() // 2))
-            screen.blit(img, rect)
-        
-        # Render basic UI
-        font = pygame.font.Font(None, 48)
-        txt = font.render("COMBATE PROTOTIPO", True, (255, 255, 255))
-        screen.blit(txt, (screen.get_width()//2 - txt.get_width()//2, 50))
-        
-        font_small = pygame.font.Font(None, 24)
-        esc_txt = font_small.render("Presiona ESC para volver al mapa", True, (200, 200, 200))
-        screen.blit(esc_txt, (screen.get_width()//2 - esc_txt.get_width()//2, screen.get_height() - 50))
+        for i, option in enumerate(self.options):
+            text = self.font.render(option, True, (255, 255, 255) if i == self.selected_option_index else (128, 128, 128))
+            screen.blit(text, (100, 100 + i * 40))
+
+        pygame.draw.rect(screen, (0, 255, 0), self.back_button_rect)
+        back_text = self.font.render("VOLVER", True, (0, 0, 0))
+        screen.blit(back_text, (self.back_button_rect.centerx - back_text.get_width() // 2, self.back_button_rect.centery - back_text.get_height() // 2))
+
+    def execute_selected_option(self):
+        if self.options[self.selected_option_index] == "ATACAR":
+            print("Héroe ataca con [ATK] de daño")
+        elif self.options[self.selected_option_index] == "DEFENDER":
+            print("Héroe se defiende: daño recibido reducido al 50%")
