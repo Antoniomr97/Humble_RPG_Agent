@@ -1,25 +1,26 @@
-# Humble Adventure Architect - PROTOCOLO ESTRICTO v2.0
+# Humble Adventure Architect - PROTOCOLO ESTRICTO v2.1
 
 ## PRIORIDAD MÁXIMA: INTEGRIDAD ESTRUCTURAL
 1. **PROHIBIDO REFACTORIZAR CLASES BASE**: No cambies `State`, `Game`, o `StateMachine` sin permiso.
 2. **VERIFICACIÓN DE RUTAS (SNAKE_CASE)**: 
-   - Los nombres de archivos DEBEN ser `snake_case` (ej. `map_state.py`).
-   - PROHIBIDO crear archivos CamelCase (ej. `MapState.py`).
-   - PROHIBIDO crear archivos con el mismo nombre en diferentes directorios.
-3. **ESTRUCTURA DE ESTADOS**:
-   - Todos los estados del juego DEBEN estar en `src/states/`.
-   - `src/core/states/` es una ruta OBSOLETA. No la uses.
+   - Los nombres de archivos DEBEN ser `snake_case`. PROHIBIDO CamelCase.
+3. **ESTRUCTURA DE ESTADOS**: Todo en `src/states/`. `src/core/states/` es OBSOLETO.
 4. **IMPORTACIÓN DE CLASES**:
    - `State` siempre desde `src.core.state`.
    - `Game` siempre desde `src.core.engine`.
 
-## LISTA DE NOMBRES SAGRADOS
-- Estado de selección: `CharacterSelectionState` (en `src/states/character_selection.py`)
-- Estado de mapa: `MapState` (en `src/states/map_state.py`)
-- Estado de combate: `CombatState` (en `src/states/combat_state.py`)
+## REGLAS CRÍTICAS DE IMPLEMENTACIÓN (ANTI-FAIL)
+1. **CONSTRUCTORES (SIGNATURES)**:
+   - `MapState` y `CombatState` DEBEN recibir `(self, game, player_data)`. NUNCA elimines `player_data`.
+2. **IMPORTS OBLIGATORIOS**: 
+   - SIEMPRE importa `pygame` si vas a usar `pygame.Rect`, `pygame.draw`, etc.
+   - SIEMPRE importa `math` si usas raíces cuadradas o distancias.
+3. **PROHIBIDO PLACEHOLDERS**:
+   - NUNCA uses rutas inventadas como `"path/to/sprite.png"`. Usa los assets reales o `pygame.Surface` si no existe el asset.
+   - NUNCA borres la lógica funcional existente (como el camino horizontal) a menos que se pida explícitamente.
 
 ## REGLAS DE CODIFICACIÓN PARA AGENTES LOCALES
-- **Gestión de Estados**: Usa `self.game.set_state(NuevoEstado(self.game, ...))`. No uses `self.manager` ni Enums para transiciones de estado.
-- **Sin Alucinaciones de Filenames**: Nunca uses un bloque de código como nombre de archivo. Verifica siempre el path antes de escribir.
-- **Limpieza**: Si detectas archivos duplicados o con nombres incorrectos (CamelCase), bórralos o informa inmediatamente.
+- **Gestión de Estados**: Usa `self.game.set_state(NuevoEstado(self.game, self.player))`. 
+- **Salida**: Entrega SIEMPRE el archivo completo y funcional. No asumas que el usuario completará los imports.
+
 
