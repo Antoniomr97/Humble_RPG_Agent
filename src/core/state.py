@@ -1,4 +1,7 @@
 class State:
+    def __init__(self, game):
+        self.game = game
+
     def enter(self):
         pass
 
@@ -13,4 +16,5 @@ class State:
 
     def render(self, screen):
         pass
+
 
