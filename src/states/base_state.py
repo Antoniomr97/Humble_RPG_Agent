@@ -1,12 +1,4 @@
-class State:
-    def __init__(self, manager):
-        self.manager = manager
+from src.core.state import State
 
-    def handle_events(self, event):
-        pass
-
-    def update(self, dt):
-        pass
-
-    def render(self, screen):
-        pass
+class BaseState(State):
+    pass
