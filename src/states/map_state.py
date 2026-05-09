@@ -1,23 +1,33 @@
-from src.core.state_manager import StateManager
-from src.core.engine import Game
 import pygame
+from src.core.state import State
 
 class MapState(State):
-    def __init__(self, game, player):
-        super().__init__(game)
-        self.player = player
-        self.background_color = (0, 0, 0)
+    def __init__(self, game, player_data):
+        self.game = game
+        self.player = player_data
+        self.player_pos = [400, 300]
+        self.font = pygame.font.Font(None, 24)
 
     def handle_events(self, event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                self.game.set_state(StateManager.CHARACTER_SELECTION_STATE)
+                from src.states.character_selection import CharacterSelectionState
+                self.game.set_state(CharacterSelectionState(self.game))
 
     def update(self, dt):
-        pass
+        keys = pygame.key.get_pressed()
+        speed = 200
+        if keys[pygame.K_w]: self.player_pos[1] -= speed * dt
+        if keys[pygame.K_s]: self.player_pos[1] += speed * dt
+        if keys[pygame.K_a]: self.player_pos[0] -= speed * dt
+        if keys[pygame.K_d]: self.player_pos[0] += speed * dt
 
     def render(self, screen):
-        screen.fill(self.background_color)
-        player_image_rect = self.player["image"].get_rect(center=(screen.get_width() // 2, screen.get_height() // 2))
-        screen.blit(self.player["image"], player_image_rect)
-        pygame.display.flip()
+        screen.fill((34, 139, 34)) # Verde Bosque
+        # Render del personaje seleccionado
+        if "image" in self.player:
+            img = pygame.transform.scale(self.player["image"], (50, 50))
+            screen.blit(img, (self.player_pos[0], self.player_pos[1]))
+        
+        txt = self.font.render(f"Jugando como: {self.player['name']} (ESC para volver)", True, (255, 255, 255))
+        screen.blit(txt, (10, 10))

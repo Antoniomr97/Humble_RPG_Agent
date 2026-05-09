@@ -1,4 +1,5 @@
 import pygame
+from src.core.state_machine import StateMachine
 
 class Game:
     def __init__(self, width=800, height=600):
@@ -7,28 +8,27 @@ class Game:
         pygame.display.set_caption("Humble RPG Adventure")
         self.clock = pygame.time.Clock()
         self.running = True
-        self.state_manager = None
+        self.state_machine = StateMachine()
 
-    def set_state_manager(self, state_manager):
-        self.state_manager = state_manager
+    def set_state(self, state):
+        """Cambia el estado actual del juego"""
+        self.state_machine.set_state(state)
 
     def run(self):
-        print("Game loop started")
+        print("Bucle principal iniciado")
         while self.running:
-            dt = self.clock.tick(60) / 1000.0  # Delta time in seconds
+            dt = self.clock.tick(60) / 1000.0
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                
-                if self.state_manager:
-                    self.state_manager.handle_events(event)
+                if self.state_machine.current_state:
+                    # Aseguramos que el estado tenga handle_events
+                    if hasattr(self.state_machine.current_state, 'handle_events'):
+                        self.state_machine.current_state.handle_events(event)
 
-            if self.state_manager:
-                self.state_manager.update(dt)
-                self.state_manager.render(self.screen)
-
+            self.state_machine.update(dt)
+            self.state_machine.render(self.screen)
             pygame.display.flip()
 
         pygame.quit()
-        print("Game loop ended")

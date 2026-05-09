@@ -1,11 +1,15 @@
 from src.core.engine import Game
 from src.states.character_selection import CharacterSelectionState
-from src.core.state_manager import StateManager
 
 def main():
+    # Inicializamos el motor
     game = Game()
-    state_manager = StateManager(CharacterSelectionState)
-    game.set_state_manager(state_manager)
+    
+    # Creamos el primer estado y lo asignamos
+    initial_state = CharacterSelectionState(game)
+    game.set_state(initial_state)
+    
+    # Arrancamos
     game.run()
 
 if __name__ == "__main__":
