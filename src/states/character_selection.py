@@ -1,74 +1,42 @@
+from src.core.state_manager import StateManager
+from src.core.engine import Game
 import pygame
-from pygame.locals import *
-from src.states.base_state import State
-from src.states.map import MapState
 
 class CharacterSelectionState(State):
-    def __init__(self, manager):
-        super().__init__(manager)
-        self.colors = {
-            'Vermillion (Picaro)': (255, 69, 0),
-            'Backnister (Guerrero)': (221, 160, 221),
-            'Gandall (Mago)': (0, 139, 139)
-        }
-        self.stats = {
-            'Vermillion (Picaro)': {'Vida': 50, 'Ataque': 15},
-            'Backnister (Guerrero)': {'Vida': 70, 'Ataque': 20},
-            'Gandall (Mago)': {'Vida': 40, 'Ataque': 30}
-        }
-        self.character_rects = []
-        self.initialized_rects = False
-        
-        # Initialize fonts ONCE in __init__ for performance
-        self.title_font = pygame.font.Font(None, 48)
-        self.info_font = pygame.font.Font(None, 24)
+    def __init__(self, game):
+        super().__init__(game)
+        self.heroes = [
+            {"name": "Vermillion", "image_path": "assets/sprites/heroes/Vermillion/ImagenBase/PJ_Vermillion.png"},
+            {"name": "Gandall", "image_path": "assets/sprites/heroes/Gandall/ImagenBase/PJ_Gandall.png"},
+            {"name": "Backnister", "image_path": "assets/sprites/heroes/Backnister/ImagenBase/PJ_Backnister.png"}
+        ]
+        self.selected_index = 0
+        self.hero_images = [pygame.image.load(hero["image_path"]).convert_alpha() for hero in self.heroes]
+        self.font = pygame.font.Font(None, 36)
+        self.background_color = (0, 0, 0)
 
     def handle_events(self, event):
-        if event.type == MOUSEBUTTONDOWN:
-            for rect, name in self.character_rects:
-                if rect.collidepoint(event.pos):
-                    print(f"Selected: {name}")
-                    # Transition to MapState, passing the stats
-                    self.manager.change_state(MapState(self.manager, self.stats[name]))
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                self.selected_index = max(0, self.selected_index - 1)
+            elif event.key == pygame.K_DOWN:
+                self.selected_index = min(len(self.heroes) - 1, self.selected_index + 1)
+            elif event.key == pygame.K_ESCAPE:
+                self.game.set_state(StateManager.MAP_STATE)
 
     def update(self, dt):
         pass
 
     def render(self, screen):
-        # Premium Dark Background
-        screen.fill((30, 30, 30))
-        width, height = screen.get_size()
+        screen.fill(self.background_color)
+        for i, hero in enumerate(self.heroes):
+            text = self.font.render(hero["name"], True, (255, 255, 255))
+            text_rect = text.get_rect(center=(screen.get_width() // 2, 100 + i * 100))
+            screen.blit(text, text_rect)
+            hero_image_rect = self.hero_images[i].get_rect(center=(screen.get_width() // 2, 300 + i * 100))
+            screen.blit(self.hero_images[i], hero_image_rect)
         
-        # Draw title
-        title_surf = self.title_font.render("Selecciona tu Personaje", True, (255, 255, 255))
-        screen.blit(title_surf, (width//2 - title_surf.get_width()//2, 50))
-        
-        if not self.initialized_rects:
-            self.character_rects = []
-            
-        for i, (name, color) in enumerate(self.colors.items()):
-            # Calculate position
-            rect_width = 180
-            rect_height = 180
-            spacing = (width - (rect_width * 3)) // 4
-            x = spacing + i * (rect_width + spacing)
-            y = (height // 2) - 100
-            
-            char_rect = pygame.Rect(x, y, rect_width, rect_height)
-            if not self.initialized_rects:
-                self.character_rects.append((char_rect, name))
-            
-            # Draw character square
-            pygame.draw.rect(screen, color, char_rect)
-            # Add a white border
-            pygame.draw.rect(screen, (255, 255, 255), char_rect, 2)
-            
-            # Draw name and stats below
-            name_surf = self.info_font.render(name, True, (255, 255, 255))
-            screen.blit(name_surf, (x, y + rect_height + 15))
-            
-            stat_text = f"HP: {self.stats[name]['Vida']} | ATK: {self.stats[name]['Ataque']}"
-            stats_surf = self.info_font.render(stat_text, True, (220, 220, 220))
-            screen.blit(stats_surf, (x, y + rect_height + 40))
-            
-        self.initialized_rects = True
+        pygame.display.flip()
+
+    def get_selected_hero(self):
+        return self.heroes[self.selected_index]
